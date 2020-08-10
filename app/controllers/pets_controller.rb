@@ -1,10 +1,13 @@
 class PetsController < ApplicationController
   before_action :set_pet, only: [:show, :edit, :update, :destroy]
+  before_action :current_client
 
   # GET /pets
   # GET /pets.json
   def index
-    @pets = Pet.all
+    #@pets = Pet.all
+    #@client = Client.find(params[:client_id])
+    @pets = @client.pets 
   end
 
   # GET /pets/1
@@ -15,10 +18,12 @@ class PetsController < ApplicationController
   # GET /pets/new
   def new
     @pet = Pet.new
+    @clients = Client.pluck :name, :id 
   end
 
   # GET /pets/1/edit
   def edit
+    @clients = Client.pluck :name, :id 
   end
 
   # POST /pets
@@ -56,7 +61,7 @@ class PetsController < ApplicationController
   def destroy
     @pet.destroy
     respond_to do |format|
-      format.html { redirect_to pets_url, notice: 'Pet was successfully destroyed.' }
+      format.html { redirect_to client_pets_url, notice: 'Pet was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -69,6 +74,10 @@ class PetsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def pet_params
-      params.require(:pet).permit(:name, :race, :birthdate)
+      params.require(:pet).permit(:name, :race, :birthdate, :client_id)
     end
+
+    def current_client
+      @client = Client.find(params[:client_id])
+    end 
 end
